@@ -25,7 +25,7 @@ class User:     #class for user
         changinginfo = True
         selectedoption = 0
         while changinginfo:
-            print("What do you wish to change?")
+            print("What do you wish to change?\n")
 
             if selectedoption == 0:
                 print(Color.selected, end="")
@@ -48,8 +48,9 @@ class User:     #class for user
                 print(Color.selected, end="")
             print("Exit" + Color.default)
 
-
+            print(Color.black)
             pressedkey = str(msvcrt.getch())
+            print(Color.default)
             Clear()
 
             match(pressedkey):
@@ -72,17 +73,19 @@ class User:     #class for user
                 case "b'\\r'":
 
                     if selectedoption == 0:
-                        print("temp")
+                        User.ChangeName(self)
 
                     elif selectedoption == 1:
 
                         if self.partner == None:
-                            User.Addpartner(self)
+                            User.Addnewpartner(self)
 
                         else:
                             userinput = input("Do you wish to remove " + self.partner.Name() + " as your partner? y/n: ")
                             if userinput == "y":
-                                self.partner = None
+                                self.partner.Removepartner()
+                                User.Removepartner(self)
+                                
 
                     elif selectedoption == 2:
                         User.Changepassword(self)
@@ -104,7 +107,7 @@ class User:     #class for user
                 self.password = hashlib.pbkdf2_hmac("sha256", newpassword.encode('utf-8'), self.salt, 156234)
                 print("Password changed, returning to previous menu...")
                 attempts = 5
-                sleep(2)
+                sleep(1)
 
             else:
                 print("Incorrect password, please try again.")
@@ -115,7 +118,7 @@ class User:     #class for user
             sleep(2)
 
 
-    def Addpartner(self):    #used when you get a new partner
+    def Addnewpartner(self):    #used when you get a new partner with an existing user, not used when creating a user
         foundpartner = False
         while not foundpartner:
 
@@ -137,6 +140,16 @@ class User:     #class for user
 
 
 
+    def Addpartner(self, user):     #used when first creating a new user
+        self.partner = user
+
+
+
+    def Removepartner(self):
+        self.partner = None
+
+
+
     def ChangeName(self):
         newname = input("Please enter your new name: ")
         self.name = newname
@@ -146,7 +159,11 @@ class User:     #class for user
 
 
     def Addaccount(self):   #when adding a account
-        saldo = Parseint("Please enter your starting saldo: ")
+        saldo = -50
+        while saldo < 0:
+            saldo = Parseint("Please enter your starting saldo: ")
+            if  saldo < 0:
+                print("Error! Cannot start with a sum below 0")
         kontoid = str(self.id) + "-" + str((len(self.accounts) + 1))  #writes the user id + "-(number of account)"
         self.accounts.append(Account(saldo, kontoid))
 
@@ -174,8 +191,49 @@ class User:     #class for user
     
 
 
-    def ViewPassword(self):     #used for testing
-        print(self.password)
+    def Chooseaccount(self):
+        choosingaccount = True
+        selectedoption = 0
+        while choosingaccount:
+
+            for i in range(len(self.accounts)):
+
+                if selectedoption == i:
+                    print(Color.selected, end="")
+                print(self.accounts[i].AccountID() + Color.default + " money in account: " + str(self.accounts[i].Saldo()))
+            
+            print(Color.black)
+            pressedbutton = str(msvcrt.getch())
+            print(Color.default)
+            Clear()
+
+            match(pressedbutton):
+                case "b'w'" | "b'H'":
+                    if selectedoption <= 0:
+                        selectedoption = len(self.accounts) - 1
+
+                    else:
+                        selectedoption -= 1
+
+                case "b's'" | "b'P'":
+
+                    if selectedoption >= len(self.accounts) - 1:
+                        selectedoption = 0
+
+                    else:
+                        selectedoption += 1
+
+                case "b'\\r'":
+                    User.Transaction(self, selectedoption)
+
+
+                case "b'q'":
+                    sys.exit()
+
+
+
+    def Transaction(self):
+        print("temp")
 
 
 
@@ -220,34 +278,41 @@ class User:     #class for user
 
             if selectedoption == 1:
                 print(Color.selected, end="")
-            print("Change user information" + Color.default)  
+            print("View partner information" + Color.default)  
 
             if selectedoption == 2:
                 print(Color.selected, end="")
-            print("Add account" + Color.default) 
+            print("Change user information" + Color.default) 
 
             if selectedoption == 3:
                 print(Color.selected, end="")
-            print("perform transaction with account" + Color.default)
+            print("Add account" + Color.default) 
 
             if selectedoption == 4:
                 print(Color.selected, end="")
+            print("perform transaction with account" + Color.default)
+
+            if selectedoption == 5:
+                print(Color.selected, end="")
             print("Log out" + Color.default)
 
+            print(Color.black)
             pressedkey = str(msvcrt.getch())
+            print(Color.default)
+
             Clear()
             match(pressedkey):
 
                 case "b'w'" | "b'H'":
                     if selectedoption <= 0:
-                        selectedoption = 4
+                        selectedoption = 5
 
                     else:
                         selectedoption -= 1
 
                 case "b's'" | "b'P'":
 
-                    if selectedoption >= 4:
+                    if selectedoption >= 5:
                         selectedoption = 0
 
                     else:
@@ -259,18 +324,26 @@ class User:     #class for user
                         os.system("pause")
 
                     elif selectedoption == 1:
-                        User.Changeuserinfo(self)
+                        try:
+                            self.partner.Info()
+
+                        except:
+                            print("No partner avalible")
+                        os.system("pause")
 
                     elif selectedoption == 2:
-                        User.Addaccount(self)
+                        User.Changeuserinfo(self)
 
                     elif selectedoption == 3:
-                        print("temp")
+                        User.Addaccount(self)
+
+                    elif selectedoption == 4:
+                        User.Chooseaccount(self)
 
                     else:
                         loggedin = False
                         print("Logging out, please wait...")
-                        sleep(2)
+                        sleep(1)
 
                     Clear()
 
@@ -286,8 +359,10 @@ Clear = lambda: os.system('cls')
 def Parseint(message):  #method for parsing a int
     while True:
         try:
+
             userinput = int(input(message))
             return userinput
+
         except ValueError:
             print("Incorrect input, please try again")
 
@@ -296,7 +371,9 @@ def Parseint(message):  #method for parsing a int
 def Parsefloat(message):    #method to parse float
     while True:
         try:
+
             userinput = float(input(message))
             return userinput
+
         except ValueError:
             print("Incorrect input, please try again")
