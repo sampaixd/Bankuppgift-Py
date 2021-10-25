@@ -30,6 +30,7 @@ def Login(users):   #method for logging into a account
                     if (rightpassword == True):
                         print("Logging in as " + users[i].Name() + "...")
                         sleep(2)
+                        Clear()
                         users[i].Loggedin()
                         attempts = 5
                         findingname = False
@@ -124,8 +125,7 @@ def Main():
     while programloop:
 
         print("Welcome to the bank app!")
-        print("What do you wish to do?")
-        print() 
+        print("What do you wish to do?\n") 
 
         if currentoption == 0:
             print(Color.selected, end="")   
@@ -142,9 +142,10 @@ def Main():
         if currentoption == 3:
             print(Color.selected, end="")
         print("Exit" + Color.default)
-        print()
+        print(Color.black)
 
         keypressed = str(msvcrt.getch())
+        print(Color.default)
         #print("pressed " + str(keypressed))
         Clear()
 
@@ -195,4 +196,6 @@ def Main():
                     sys.exit()
         Clear()
 
-Main()
+
+if __name__ == "__main__":
+    Main()

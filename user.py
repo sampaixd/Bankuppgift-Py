@@ -3,6 +3,7 @@ import os
 import getpass
 import msvcrt
 import sys
+from time import sleep
 from account import Account
 from colors import Color
 
@@ -18,6 +19,10 @@ class User:     #class for user
 
 
 
+    def Changeuserinfo(self):
+        
+
+
     def Addpartner(self, nypartner):    #used when you get a new partner
         self.partner = nypartner
 
@@ -30,8 +35,8 @@ class User:     #class for user
 
     def Addaccount(self):   #when adding a account
         saldo = Parseint("Please enter your starting saldo: ")
-        kontoid = self.id.Tostring + "-" + (1 + 1)  #writes the user id + "-(number of account)"
-        self.konton.append(Account(saldo, kontoid))
+        kontoid = str(self.id) + "-" + str((len(self.accounts) + 1))  #writes the user id + "-(number of account)"
+        self.accounts.append(Account(saldo, kontoid))
 
 
 
@@ -69,6 +74,7 @@ class User:     #class for user
     
     def Info(self):     #used for testing, will be accessible when logged in sometime later
         print("Username: " + self.name)
+        print("User ID: " + str(self.id))
 
         if (self.partner == None):
             print("Partner: None")
@@ -82,8 +88,9 @@ class User:     #class for user
             print("Accounts: None")
 
         else:
+            print("Accounts:")
             for i in range(len(self.accounts)):
-                print(self.accounts[i].AccountID())
+                print(self.accounts[i].AccountID() + "   money in account: " + str(self.accounts[i].Saldo()) + " usd")
 
 
 
@@ -116,6 +123,7 @@ class User:     #class for user
             print("Log out" + Color.default)
 
             pressedkey = str(msvcrt.getch())
+            Clear()
             match(pressedkey):
 
                 case "b'w'" | "b'H'":
@@ -132,9 +140,29 @@ class User:     #class for user
 
                     else:
                         selectedoption += 1
+
+                case "b'\\r'":
+                    if selectedoption == 0:
+                        User.Info(self)
+                        os.system("pause")
+
+                    elif selectedoption == 1:
+                        print("temp")
+
+                    elif selectedoption == 2:
+                        User.Addaccount(self)
+
+                    elif selectedoption == 3:
+                        print("temp")
+
+                    else:
+                        loggedin = False
+                        print("Logging out, please wait...")
+                        sleep(2)
+
                 case "b'q'":
                     sys.exit()
-
+        
             Clear()
 
 

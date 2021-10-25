@@ -8,3 +8,6 @@ class Account:    #accounts where you store money
     
     def AccountID(self):
         return self.accountid
+
+    def Saldo(self):
+        return self.saldo
