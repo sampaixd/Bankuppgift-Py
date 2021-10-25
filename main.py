@@ -169,15 +169,6 @@ def Main():
                 else:
                     currentoption += 1
 
-            case"b'p'":
-
-                currentuser = 1
-                for i in range(len(users)):
-
-                    print(currentuser, ": ", end="")
-                    users[i].ViewPassword()
-                os.system('pause')
-
             case "b'\\r'":
 
                 if currentoption == 0:
