@@ -20,16 +20,78 @@ class User:     #class for user
 
 
     def Changeuserinfo(self):
-        
+        changinginfo = True
+        selectedoption = 0
+        while changinginfo:
+            print("What do you wish to change?")
+
+            if selectedoption == 0:
+                print(Color.selected, end="")
+            print("Name" + Color.default)
+
+            if selectedoption == 1:
+                print(Color.selected, end="")
+            
+            if self.partner == None:
+                print("Add partner" + Color.default)
+
+            else:
+                print("Remove partner" + Color.default)
+
+            if selectedoption == 2:
+                print(Color.selected, end="")
+            print("Change password")
+
+            if selectedoption == 3:
+                print(Color.selected, end="")
+            print("Exit" + Color.default)
 
 
-    def Addpartner(self, nypartner):    #used when you get a new partner
-        self.partner = nypartner
+            pressedkey = str(msvcrt.getch())
+            Clear()
+
+            match(pressedkey):
+
+                case "b'w'" | "b'H'":
+                    if currentoption <= 0:
+                        currentoption = 3
+
+                    else:
+                        currentoption -= 1
+
+                case "b's'" | "b'P'":
+
+                    if currentoption >= 3:
+                        currentoption = 0
+
+                    else:
+                        currentoption += 1
+
+                case "b'\\r'":
+
+                    if currentoption == 0:
+                        print("temp")
+
+
+    def Addpartner(self):    #used when you get a new partner
+        newpartner = input("Please enter the name of your new partner")
+        for i in range(len(self.accounts)):
+            foundpartner = User.CompareName(newpartner)
+            if foundpartner == True:
+                print("Partner found, adding " + newpartner + "as your new partner")
+                self.partner = newpartner
 
 
 
     def Removepartner(self):    #used when removing a partner
         partner = None
+
+
+    def ChangeName(self):
+        newname = input("Please enter your new name: ")
+        self.name = newname
+        print("Name changed to " + self.name + "!, returning to prevoius menu...")
+        sleep(2)        
 
 
 
@@ -45,6 +107,7 @@ class User:     #class for user
         print (accountID)
         print(self.partner)
     
+
 
 
     def CompareName(self, userinput):   #used to compare different names, used to find users when logging in or adding partners
