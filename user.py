@@ -3,9 +3,11 @@ import os
 import getpass
 import msvcrt
 import sys
+import getpass
 from time import sleep
 from account import Account
 from colors import Color
+#from main import Login
 
 
 class User:     #class for user
@@ -40,7 +42,7 @@ class User:     #class for user
 
             if selectedoption == 2:
                 print(Color.selected, end="")
-            print("Change password")
+            print("Change password" + Color.default)
 
             if selectedoption == 3:
                 print(Color.selected, end="")
@@ -53,38 +55,86 @@ class User:     #class for user
             match(pressedkey):
 
                 case "b'w'" | "b'H'":
-                    if currentoption <= 0:
-                        currentoption = 3
+                    if selectedoption <= 0:
+                        selectedoption = 3
 
                     else:
-                        currentoption -= 1
+                        selectedoption -= 1
 
                 case "b's'" | "b'P'":
 
-                    if currentoption >= 3:
-                        currentoption = 0
+                    if selectedoption >= 3:
+                        selectedoption = 0
 
                     else:
-                        currentoption += 1
+                        selectedoption += 1
 
                 case "b'\\r'":
 
-                    if currentoption == 0:
+                    if selectedoption == 0:
                         print("temp")
+
+                    elif selectedoption == 1:
+
+                        if self.partner == None:
+                            User.Addpartner(self)
+
+                        else:
+                            userinput = input("Do you wish to remove " + self.partner.Name() + " as your partner? y/n: ")
+                            if userinput == "y":
+                                self.partner = None
+
+                    elif selectedoption == 2:
+                        User.Changepassword(self)
+                    
+                    else:
+                        changinginfo = False
+                    Clear()
+
+
+    def Changepassword(self):
+        attempts = 0
+        while attempts < 3:
+        
+            newpassword = getpass.getpass("Please enter your old password: ")
+            correctpassword = User.Login(self, newpassword)
+
+            if correctpassword == True:
+                newpassword = getpass.getpass("Please enter your new password: ")
+                self.password = hashlib.pbkdf2_hmac("sha256", newpassword.encode('utf-8'), self.salt, 156234)
+                print("Password changed, returning to previous menu...")
+                attempts = 5
+                sleep(2)
+
+            else:
+                print("Incorrect password, please try again.")
+                attempts += 1
+                
+        if attempts == 3:
+            print("Couldn't input the correct password, returning to previous menu...")
+            sleep(2)
 
 
     def Addpartner(self):    #used when you get a new partner
-        newpartner = input("Please enter the name of your new partner")
-        for i in range(len(self.accounts)):
-            foundpartner = User.CompareName(newpartner)
-            if foundpartner == True:
-                print("Partner found, adding " + newpartner + "as your new partner")
-                self.partner = newpartner
+        foundpartner = False
+        while not foundpartner:
 
+            newpartner = input("Please enter the name of your new partner")
 
+            for i in range(len(self.accounts)):
 
-    def Removepartner(self):    #used when removing a partner
-        partner = None
+                foundpartner = User.CompareName(newpartner)
+
+                if foundpartner == True:
+                    print("Partner found, adding " + newpartner + "as your new partner")
+                    self.partner = newpartner
+
+            if foundpartner == False:
+                newpartner = input("Couldn't find the partner, do you wish to try again? y/n: ")
+
+                if (newpartner == "n"):
+                    foundpartner = True
+
 
 
     def ChangeName(self):
@@ -105,8 +155,7 @@ class User:     #class for user
     def WriteaccountID(self):   #used for testing
         accountID = str(self.id) + '-' + str(1)
         print (accountID)
-        print(self.partner)
-    
+        print(self.partner)    
 
 
 
@@ -210,7 +259,7 @@ class User:     #class for user
                         os.system("pause")
 
                     elif selectedoption == 1:
-                        print("temp")
+                        User.Changeuserinfo(self)
 
                     elif selectedoption == 2:
                         User.Addaccount(self)
@@ -223,12 +272,11 @@ class User:     #class for user
                         print("Logging out, please wait...")
                         sleep(2)
 
+                    Clear()
+
                 case "b'q'":
-                    sys.exit()
-        
-            Clear()
-
-
+                    sys.exit()                        
+            
 
 
 Clear = lambda: os.system('cls')

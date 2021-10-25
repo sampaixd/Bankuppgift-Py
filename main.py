@@ -194,7 +194,10 @@ def Main():
                     
                 else:
                     sys.exit()
-        Clear()
+                
+                Clear()
+
+
 
 
 if __name__ == "__main__":
