@@ -21,7 +21,7 @@ class User:     #class for user
 
 
 
-    def Changeuserinfo(self):
+    def Changeuserinfo(self, users):
         changinginfo = True
         selectedoption = 0
         while changinginfo:
@@ -78,7 +78,7 @@ class User:     #class for user
                     elif selectedoption == 1:
 
                         if self.partner == None:
-                            User.Addnewpartner(self)
+                            User.Addnewpartner(self, users)
 
                         else:
                             userinput = input("Do you wish to remove " + self.partner.Name() + " as your partner? y/n: ")
@@ -191,7 +191,7 @@ class User:     #class for user
     
 
 
-    def Chooseaccount(self):
+    def Chooseaccount(self, users):
         choosingaccount = True
         selectedoption = 0
         while choosingaccount:
@@ -224,7 +224,7 @@ class User:     #class for user
                         selectedoption += 1
 
                 case "b'\\r'":
-                    User.Transaction(self, selectedoption)
+                    User.Transaction(self, selectedoption, users)
 
 
                 case "b'q'":
@@ -232,10 +232,67 @@ class User:     #class for user
 
 
 
-    def Transaction(self):
-        print("temp")
+    def Transaction(self, selectedaccount, users):
+        findingrecipient = True
+        foundname = False
+        foundbankid = False
+        usernumber = 0
+        useraccountnumber = 0
+        while findingrecipient:
+            print("enter 'exit' to return to menu")
+            recipient = input("Please enter the name or the account id of the recipient: ")
+            for i in range(len(users)):
+
+                if users[i].CompareName(recipient):
+                    foundname = True
+                    findingrecipient = False
+                    usernumber = i
+                    break
+
+                else:
+                    for x in range(users[i].Accounts()):
+
+                        if recipient == users[i].accounts[x].AccountID():
+                            foundbankid = True
+                            
+                            findingrecipient = False
+                            usernumber = i
+                            accountnumber = x
+                            break
+                    
+            if findingrecipient == True and recipient != "exit":
+                print("Couldn't find the user or account id, please try again")
+
+            elif recipient == "exit":
+                findingrecipient = False
+
+        while foundname:
+            selectedoption = 0
+            print("User found!")
+            print("What account from " + users[usernumber].Name() + " do you wish to send money to?")
+            for i in range(users[usernumber].Accounts()):
+                if selectedoption == i:
+                    print(Color.selected, end="")
+                print(users[usernumber].accounts[i].AccountID() + Color.default + " money in account: " + str(users[usernumber].accounts[i].Saldo()))
+            
+            print(Color.black)
+            pressedbutton = str(msvcrt.getch())
+            print(Color.default)
+            Clear()
+            
+
+        while foundbankid:
+            transaction = input("Please enter how much money you wish to send to " + users[usernumber].Name() + ": ")
+
+            if self.accounts[selectedaccount].Saldo() >= transaction:
+
+                self.accounts[selectedaccount].Transaction(-transaction)
+                users[usernumber].accounts[useraccountnumber].Transaction(transaction)
 
 
+
+    def Accounts(self):
+        return len(self.accounts)
 
     def Name(self):     #used for returning the name of the user
         return self.name
@@ -260,11 +317,11 @@ class User:     #class for user
         else:
             print("Accounts:")
             for i in range(len(self.accounts)):
-                print(self.accounts[i].AccountID() + "   money in account: " + str(self.accounts[i].Saldo()) + " usd")
+                money = input(self.accounts[i].AccountID() + "   money in account: " + str(self.accounts[i].Saldo()) + " usd")
+                
 
 
-
-    def Loggedin(self):
+    def Loggedin(self, users):
         loggedin = True
         selectedoption = 0
         while loggedin:
@@ -332,13 +389,13 @@ class User:     #class for user
                         os.system("pause")
 
                     elif selectedoption == 2:
-                        User.Changeuserinfo(self)
+                        User.Changeuserinfo(self, users)
 
                     elif selectedoption == 3:
                         User.Addaccount(self)
 
                     elif selectedoption == 4:
-                        User.Chooseaccount(self)
+                        User.Chooseaccount(self, users)
 
                     else:
                         loggedin = False

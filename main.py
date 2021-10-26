@@ -31,7 +31,7 @@ def Login(users):   #method for logging into a account
                         print("Logging in as " + users[i].Name() + "...")
                         sleep(2)
                         Clear()
-                        users[i].Loggedin()
+                        users[i].Loggedin(users)
                         attempts = 5
                         findingname = False
 
