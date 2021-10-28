@@ -118,19 +118,20 @@ class User:     #class for user
             sleep(2)
 
 
-    def Addnewpartner(self):    #used when you get a new partner with an existing user, not used when creating a user
+    def Addnewpartner(self, users):    #used when you get a new partner with an existing user, not used when creating a user
         foundpartner = False
         while not foundpartner:
 
             newpartner = input("Please enter the name of your new partner")
 
-            for i in range(len(self.accounts)):
+            for i in range(len(users)):
 
-                foundpartner = User.CompareName(newpartner)
+                foundpartner = users[i].CompareName(newpartner)
 
                 if foundpartner == True:
                     print("Partner found, adding " + newpartner + "as your new partner")
                     self.partner = newpartner
+                    break
 
             if foundpartner == False:
                 newpartner = input("Couldn't find the partner, do you wish to try again? y/n: ")
@@ -225,6 +226,7 @@ class User:     #class for user
 
                 case "b'\\r'":
                     User.Transaction(self, selectedoption, users)
+                    choosingaccount = False
 
 
                 case "b'q'":
@@ -238,6 +240,7 @@ class User:     #class for user
         foundbankid = False
         usernumber = 0
         useraccountnumber = 0
+        selectedoption = 0
         while findingrecipient:
             print("enter 'exit' to return to menu")
             recipient = input("Please enter the name or the account id of the recipient: ")
@@ -265,9 +268,9 @@ class User:     #class for user
 
             elif recipient == "exit":
                 findingrecipient = False
+                Clear()
 
         while foundname:
-            selectedoption = 0
             print("User found!")
             print("What account from " + users[usernumber].Name() + " do you wish to send money to?")
             for i in range(users[usernumber].Accounts()):
@@ -275,20 +278,50 @@ class User:     #class for user
                     print(Color.selected, end="")
                 print(users[usernumber].accounts[i].AccountID() + Color.default + " money in account: " + str(users[usernumber].accounts[i].Saldo()))
             
+            print(selectedoption)
             print(Color.black)
             pressedbutton = str(msvcrt.getch())
             print(Color.default)
             Clear()
+
+            match(pressedbutton):
+                case "b'w'" | "b'H'":
+                    if selectedoption <= 0:
+                        selectedoption = users[usernumber].Accounts() - 1
+
+                    else:
+                        selectedoption -= 1
+
+                case "b's'" | "b'P'":
+
+                    if selectedoption >= users[usernumber].Accounts() - 1:
+                        selectedoption = 0
+
+                    else:
+                        selectedoption += 1
+
+                case "b'\\r'":
+                    useraccountnumber = selectedoption
+                    foundname = False
+                    foundbankid = True
             
 
         while foundbankid:
-            transaction = input("Please enter how much money you wish to send to " + users[usernumber].Name() + ": ")
+            transaction = int(input("Please enter how much money you wish to send to " + users[usernumber].Name() + ": "))
 
             if self.accounts[selectedaccount].Saldo() >= transaction:
 
                 self.accounts[selectedaccount].Transaction(-transaction)
                 users[usernumber].accounts[useraccountnumber].Transaction(transaction)
+                print("Successfully sent " + str(transaction) + " usd to " + users[usernumber].Name() + "! returning to main menu...")
+                sleep(1)
+                foundbankid = False
+                Clear()
 
+            else:
+                print(Color.error + "ERROR!" + Color.default + " cannot send more than " + str(self.accounts[selectedaccount].Saldo()) + " usd to recipient. Please try again")
+                
+            
 
 
     def Accounts(self):
@@ -308,7 +341,7 @@ class User:     #class for user
 
         else:
             print("Partner: ", end="")
-            print(self.partner.Name())
+            print(str(self.partner.Name()))
         print("Encrypted password: " + str(self.password))
 
         if len(self.accounts) == 0:
@@ -317,7 +350,7 @@ class User:     #class for user
         else:
             print("Accounts:")
             for i in range(len(self.accounts)):
-                money = input(self.accounts[i].AccountID() + "   money in account: " + str(self.accounts[i].Saldo()) + " usd")
+                print(self.accounts[i].AccountID() + "   money in account: " + str(self.accounts[i].Saldo()) + " usd")
                 
 
 
@@ -421,7 +454,7 @@ def Parseint(message):  #method for parsing a int
             return userinput
 
         except ValueError:
-            print("Incorrect input, please try again")
+            print(Color.error + "Incorrect input, please try again" + Color.default)
 
 
 
@@ -433,4 +466,4 @@ def Parsefloat(message):    #method to parse float
             return userinput
 
         except ValueError:
-            print("Incorrect input, please try again")
+            print(Color.error + "Incorrect input, please try again" + Color.default)
