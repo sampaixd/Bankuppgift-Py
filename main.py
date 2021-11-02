@@ -5,6 +5,7 @@ import getpass
 import msvcrt
 import sys
 from user import User
+from admin import Admin
 from time import sleep
 from colors import Color
 
@@ -118,6 +119,7 @@ Clear = lambda: os.system('cls')
 
 def Main():
     users = []
+    admin = Admin()
     currentoption = 0
     Clear()
     programloop = True
@@ -137,9 +139,13 @@ def Main():
 
         if currentoption == 2:
             print(Color.selected, end="")
-        print("View all users" + Color.default)
+        print("Admin login" + Color.default)
 
         if currentoption == 3:
+            print(Color.selected, end="")
+        print("View all users" + Color.default)
+
+        if currentoption == 4:
             print(Color.selected, end="")
         print("Exit" + Color.default)
         print(Color.black)
@@ -156,14 +162,14 @@ def Main():
 
             case "b'w'" | "b'H'":
                 if currentoption <= 0:
-                    currentoption = 3
+                    currentoption = 4
 
                 else:
                     currentoption -= 1
 
             case "b's'" | "b'P'":
 
-                if currentoption >= 3:
+                if currentoption >= 4:
                     currentoption = 0
 
                 else:
@@ -178,6 +184,9 @@ def Main():
                     Login(users)
 
                 elif currentoption == 2:
+                    admin.Login(users)
+
+                elif currentoption == 3:
                     for i in range(len(users)):
 
                         users[i].Info()

@@ -130,8 +130,9 @@ class User:     #class for user
 
                 if foundpartner == True:
                     print("Partner found, adding " + newpartner + "as your new partner")
-                    self.partner = newpartner
-                    break
+                    self.partner = users[i]
+                    users[i].Addpartner(self)   #adds the current user into their partners partner variable by 
+                    break                       #using "self" to send itself. Had no idea this worked, very much of a pleasant suprise
 
             if foundpartner == False:
                 newpartner = input("Couldn't find the partner, do you wish to try again? y/n: ")
@@ -278,7 +279,7 @@ class User:     #class for user
                     print(Color.selected, end="")
                 print(users[usernumber].accounts[i].AccountID() + Color.default + " money in account: " + str(users[usernumber].accounts[i].Saldo()))
             
-            print(selectedoption)
+            #print(selectedoption)  #testing only
             print(Color.black)
             pressedbutton = str(msvcrt.getch())
             print(Color.default)
@@ -327,6 +328,8 @@ class User:     #class for user
     def Accounts(self):
         return len(self.accounts)
 
+
+
     def Name(self):     #used for returning the name of the user
         return self.name
 
@@ -341,7 +344,7 @@ class User:     #class for user
 
         else:
             print("Partner: ", end="")
-            print(str(self.partner.Name()))
+            print(self.partner.Name())
         print("Encrypted password: " + str(self.password))
 
         if len(self.accounts) == 0:
@@ -454,7 +457,7 @@ def Parseint(message):  #method for parsing a int
             return userinput
 
         except ValueError:
-            print(Color.error + "Incorrect input, please try again" + Color.default)
+            print(Color.error + "ERROR! " + Color.default + "Incorrect input, please try again")
 
 
 
@@ -466,4 +469,4 @@ def Parsefloat(message):    #method to parse float
             return userinput
 
         except ValueError:
-            print(Color.error + "Incorrect input, please try again" + Color.default)
+            print(Color.error + "ERROR! " + Color.default + "Incorrect input, please try again")
