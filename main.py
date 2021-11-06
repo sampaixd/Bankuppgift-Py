@@ -22,28 +22,38 @@ def Login(users):   #method for logging into a account
             founduser = users[i].CompareName(userinput)
 
             if (founduser == True):
-                attempts = 0
 
-                while (attempts < 3):
-                    userinput = getpass.getpass("Hello " + users[i].Name() + ", Please enter your password: ")
-                    rightpassword = users[i].Login(userinput)
-
-                    if (rightpassword == True):
-                        print("Logging in as " + users[i].Name() + "...")
-                        sleep(2)
-                        Clear()
-                        users[i].Loggedin(users)
-                        attempts = 5
-                        findingname = False
-
-                    else:
-                        print("Wrong password, please try again")
-                        attempts += 1
-
-                if (attempts == 3):
-                    print("Failed to input the correct password, returning to main menu...")
-                    sleep(2)
+                if users[i].locked == True:
+                    print("Account has been locked, please contact admin to resolve issue")
+                    os.system("pause")
                     findingname = False
+                    Clear()
+
+                else:
+
+                    attempts = 0
+
+                    while (attempts < 3):
+                        userinput = getpass.getpass("Hello " + users[i].Name() + ", Please enter your password: ")
+                        rightpassword = users[i].Login(userinput)
+
+                        if (rightpassword == True):
+                            print("Logging in as " + users[i].Name() + "...")
+                            sleep(2)
+                            Clear()
+                            users[i].Loggedin(users)
+                            attempts = 5
+                            findingname = False
+
+                        else:
+                            print("Wrong password, please try again")
+                            attempts += 1
+
+                    if (attempts == 3):
+                        print("Failed to input the correct password, account has been locked. Returning to main menu...")
+                        users[i].LockAccount()
+                        sleep(2)
+                        findingname = False
 
 
 

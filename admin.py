@@ -1,8 +1,10 @@
+from collections import defaultdict
 import hashlib
 import os
 import getpass
 import msvcrt
 from time import sleep
+from typing import ValuesView
 from user import User
 from colors import Color
 
@@ -53,23 +55,132 @@ class Admin:
 
     def Loggedin(self, users):
         question = "Welcome " + self.name + "! What do you wish to do?"
-        options = ["View all users", "View all transactions", "delete a user", "unlock a user", "give/remove money"]
+        options = ["View all users", "View all transactions", "delete a user", "unlock a user", "give/remove money", "Exit"]
         loggedin = True
 
         while loggedin:
             selectedoption = OptionsList(question, options)
+            
+            match(selectedoption):
+
+                case 0:
+                    Admin.ViewAllUsers(self, users)
+
+                case 1:
+                    Admin.ViewTransactionHistory(self)
+
+                case 2:
+                    Admin.DeleteUser(self, users)
+
+                case 3:
+                    Admin.UnlockUser(self, users)
+
+                case 5:
+                    print("Logging out...")
+                    sleep(1)
+                    loggedin = False
+                    Clear()
 
 
 
-    def Viewallusers(self, users):
+    def ViewAllUsers(self, users):
 
-        for i in range(len(users)):
-        
-            users[i].Info()
+        if len(users) == 0:
+            print("No users avalible")
+
+        else:
+            for i in range(len(users)):
+            
+                users[i].Info()
         os.system("pause")
         Clear()
 
+
+    
+    def ViewTransactionHistory(self):
+
+        if len(User.transactionhistory) == 0:
+            print("No transaction history avalible")
+
+        else:
+            for i in range(len(User.transactionhistory)):
+                print(User.transactionhistory[i])
+
+        os.system("pause")
+        Clear()
+
+
+
+    def DeleteUser(self, users):
+        selectinguser = True
+        
+        if len(users) == 0:
+            print("No users avalible")
+            os.system("pause")
+
+        else:
+
+            usernames = []
+            for i in range(len(users)):
+                usernames.append(users[i].name)
+
+            usernames.append("exit")
+            chosenuser = OptionsList("Please choose a user to delete", usernames)
+            
+            try:
+                print("Removed user" + users[chosenuser].name + ", returning to menu...")
+                users.pop(chosenuser)
+
+            
+            except :
+                print("Returning to main menu...")
+
+        sleep(1)
+        Clear()
+
+
+
+    def UnlockUser(self, users):
+        if len(users) == 0:
+            print("No users avalible")
+            os.system("pause")
+
+        else:
+            usernames = []
+            for i in range(len(users)):
+                lockedstatus = ""
+
+                if users[i].locked == False:
+                    lockedstatus = " Status: " + Color.green + " Unlocked" + Color.default
+
+                else:
+                    lockedstatus = " Status: " + Color.error + " Locked" + Color.default
+
+                usernames.append(users[i].name + lockedstatus)
+            usernames.append("unlock all users")
+            usernames.append("exit")
+            chosenuser = OptionsList("Please choose the user you wish to unlock", usernames)
+            Clear()
+
+            try:
+                users[chosenuser].UnlockAccount()
+                print("Account " + users[chosenuser].name + " has been unlocked!")
+            
+            except:
+                if chosenuser == len(users):
+                    for i in range(len(users)):
+                        users[i].UnlockAccount()
+                    print("Unlocked all accounts!")
+                else:
+                    print("Exiting to menu...")
+
+            os.system("pause")
+            Clear()
+
+
+
 Clear = lambda: os.system('cls')
+
 
 
 def OptionsList(question, options):

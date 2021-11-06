@@ -11,6 +11,8 @@ from colors import Color
 
 
 class User:     #class for user
+
+    transactionhistory = []
     def __init__(self, name, id, salt, password, partner):
         self.name = name
         self.id = id
@@ -18,6 +20,7 @@ class User:     #class for user
         self.password = password
         self.accounts = []      #list of accounts 
         self.partner = partner
+        self.locked = False
 
 
 
@@ -193,6 +196,16 @@ class User:     #class for user
     
 
 
+    def LockAccount(self):
+        self.locked = True
+
+
+
+    def UnlockAccount(self):
+        self.locked = False
+
+
+
     def Chooseaccount(self, users):
         choosingaccount = True
         selectedoption = 0
@@ -245,6 +258,7 @@ class User:     #class for user
         while findingrecipient:
             print("enter 'exit' to return to menu")
             recipient = input("Please enter the name or the account id of the recipient: ")
+            Clear()
             for i in range(len(users)):
 
                 if users[i].CompareName(recipient):
@@ -315,6 +329,8 @@ class User:     #class for user
                 self.accounts[selectedaccount].Transaction(-transaction)
                 users[usernumber].accounts[useraccountnumber].Transaction(transaction)
                 print("Successfully sent " + str(transaction) + " usd to " + users[usernumber].Name() + "! returning to main menu...")
+                User.transactionhistory.append(self.name + " Sent " + str(transaction) + " usd to " + users[usernumber].Name() + " from " + self.accounts[selectedaccount].AccountID()
+                + " to " + users[usernumber].accounts[useraccountnumber].AccountID())
                 sleep(1)
                 foundbankid = False
                 Clear()
@@ -338,6 +354,14 @@ class User:     #class for user
     def Info(self):     #used for testing, will be accessible when logged in sometime later
         print("Username: " + self.name)
         print("User ID: " + str(self.id))
+
+        print("Locked status: ", end="")
+        
+        if self.locked == False:
+            print(Color.green + "Unlocked" + Color.default)
+
+        else:
+            print(Color.error + "Locked" + Color.default)
 
         if (self.partner == None):
             print("Partner: None")
