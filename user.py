@@ -465,7 +465,16 @@ class User:     #class for user
                     Clear()
 
                 case "b'q'":
-                    sys.exit()                        
+                    sys.exit()        
+
+
+
+    def AdminTransaction(self, accountnumber, addremove, chosenammount):
+        if addremove == 0:
+            self.accounts[accountnumber].Transaction(chosenammount)
+
+        else:
+            self.accounts[accountnumber].Transaction(-chosenammount)
             
 
 

@@ -128,7 +128,7 @@ class Admin:
             chosenuser = OptionsList("Please choose a user to delete", usernames)
             
             try:
-                print("Removed user" + users[chosenuser].name + ", returning to menu...")
+                print("Removed user " + users[chosenuser].name + ", returning to menu...")
                 users.pop(chosenuser)
 
             
@@ -179,6 +179,75 @@ class Admin:
 
 
 
+    def ChangeAccountMoney(self, users):
+        question = "Please choose a user that you wish to give/remove money from"
+        userinfo = []
+
+        if len(users) == 0:
+            print("No users avalible")
+
+        else:
+            loop = True
+            while loop:
+                for i in range(len(users)):
+                    userinfo.append(users[i].name)
+
+                userinfo.append("exit")
+
+                chosenuser = OptionsList(question, userinfo)
+
+                userinfo.clear()
+                question = "Please select one of " + users[chosenuser].name + "s account"
+                for i in range(len(users[chosenuser].accounts)):
+                    userinfo.append(users[chosenuser].accounts[i])
+
+                userinfo.append("back")
+
+                chosenaccount = OptionsList(question, userinfo)
+
+                if chosenaccount == len(users[chosenuser].account):    pass
+                    
+                question = "Would you like to add or remove money from account?"
+                userinfo.clear()
+                userinfo.append("Add")
+                userinfo.append("Remove")
+                userinfo.append("return to start")
+
+                addremove = OptionsList(question, userinfo)
+
+                addremovemsg = ""
+
+                if addremove == 0:  addremovemsg = "add"
+
+                elif addremove == 1: addremovemsg = "remove"
+                
+                else:    pass
+                ammount = 0
+
+                selectingammount = True
+                while selectingammount:
+
+                    ammount = Parseint("Please enter how much you want to " + addremovemsg + " to the account")
+                    Clear()
+                    if ammount > users[chosenuser].accounts[chosenaccount].Saldo(): 
+                        print(Color.error + "ERROR!" + Color.default + "Cannot remove more than " + str(users[chosenuser].accounts[chosenaccount].Saldo()) + " usd from account!")
+                    else:
+                        selectingammount = False
+
+                users[chosenuser].AdminTransaction(chosenaccount, addremove, ammount)
+                print(ammount + "")
+
+                
+
+
+
+
+
+
+
+                    
+
+
 Clear = lambda: os.system('cls')
 
 
@@ -217,3 +286,15 @@ def OptionsList(question, options):
 
             case "b'\\r'":
                 return selectedoption
+
+
+
+def Parseint(message):  #method for parsing a int
+    while True:
+        try:
+
+            userinput = int(input(message))
+            return userinput
+
+        except ValueError:
+            print(Color.error + "ERROR! " + Color.default + "Incorrect input, please try again")
