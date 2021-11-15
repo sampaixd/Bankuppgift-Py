@@ -24,8 +24,13 @@ class Admin:
             os.system("pause")
 
         else:
+            gettingname = True
 
-            name = getpass.getpass("Please enter username: ")
+            while gettingname:
+                name = getpass.getpass("Please enter username: ")
+                if name == self.name: gettingname = False
+
+                else:   print("Couldn't find the admin user, please try again")
 
             attempts = 0
             while attempts < 3:
@@ -74,6 +79,9 @@ class Admin:
 
                 case 3:
                     Admin.UnlockUser(self, users)
+
+                case 4:
+                    Admin.ChangeAccountMoney(self, users)
 
                 case 5:
                     print("Logging out...")
@@ -147,32 +155,38 @@ class Admin:
 
         else:
             usernames = []
-            for i in range(len(users)):
-                lockedstatus = ""
+            usingmenu = True
+            while usingmenu:
+                for i in range(len(users)):
+                    lockedstatus = ""
 
-                if users[i].locked == False:
-                    lockedstatus = " Status: " + Color.green + " Unlocked" + Color.default
+                    if users[i].locked == False:
+                        lockedstatus = " Status: " + Color.green + " Unlocked" + Color.default
 
-                else:
-                    lockedstatus = " Status: " + Color.error + " Locked" + Color.default
+                    else:
+                        lockedstatus = " Status: " + Color.error + " Locked" + Color.default
 
-                usernames.append(users[i].name + lockedstatus)
-            usernames.append("unlock all users")
-            usernames.append("exit")
-            chosenuser = OptionsList("Please choose the user you wish to unlock", usernames)
-            Clear()
+                    usernames.append(users[i].name + lockedstatus)
+                usernames.append("unlock all users")
+                usernames.append("exit")
 
-            try:
-                users[chosenuser].UnlockAccount()
-                print("Account " + users[chosenuser].name + " has been unlocked!")
-            
-            except:
-                if chosenuser == len(users):
-                    for i in range(len(users)):
-                        users[i].UnlockAccount()
-                    print("Unlocked all accounts!")
-                else:
-                    print("Exiting to menu...")
+                chosenuser = OptionsList("Please choose the user you wish to unlock", usernames)
+                Clear()
+
+                try:
+                    users[chosenuser].UnlockAccount()
+                
+                except:
+                    if chosenuser == len(users):
+                        for i in range(len(users)):
+                            users[i].UnlockAccount()
+                        #print("Unlocked all accounts!")
+                    else:
+                        print("Exiting to menu...")
+                        usingmenu = False
+                
+                usernames.clear()
+
 
             os.system("pause")
             Clear()
@@ -182,6 +196,7 @@ class Admin:
     def ChangeAccountMoney(self, users):
         question = "Please choose a user that you wish to give/remove money from"
         userinfo = []
+        gotoaccounts = False
 
         if len(users) == 0:
             print("No users avalible")
@@ -193,25 +208,31 @@ class Admin:
                     userinfo.append(users[i].name)
 
                 userinfo.append("exit")
+                if gotoaccounts == False:    chosenuser = OptionsList(question, userinfo)
 
-                chosenuser = OptionsList(question, userinfo)
+                else:    gotoaccounts = False
+
+                if chosenuser == len(users):
+                    break
 
                 userinfo.clear()
                 question = "Please select one of " + users[chosenuser].name + "s account"
                 for i in range(len(users[chosenuser].accounts)):
-                    userinfo.append(users[chosenuser].accounts[i])
+                    userinfo.append(users[chosenuser].accounts[i].AccountID())
 
                 userinfo.append("back")
 
                 chosenaccount = OptionsList(question, userinfo)
 
-                if chosenaccount == len(users[chosenuser].account):    pass
+                if chosenaccount == len(users[chosenuser].accounts):    
+                    userinfo.clear()    
+                    continue
                     
                 question = "Would you like to add or remove money from account?"
                 userinfo.clear()
                 userinfo.append("Add")
                 userinfo.append("Remove")
-                userinfo.append("return to start")
+                userinfo.append("back")
 
                 addremove = OptionsList(question, userinfo)
 
@@ -221,21 +242,28 @@ class Admin:
 
                 elif addremove == 1: addremovemsg = "remove"
                 
-                else:    pass
+                else:
+                    gotoaccounts = True    
+                    continue
                 ammount = 0
 
                 selectingammount = True
                 while selectingammount:
 
-                    ammount = Parseint("Please enter how much you want to " + addremovemsg + " to the account")
+                    ammount = Parseint("Please enter how much you want to {} to the account: ".format(addremovemsg))
                     Clear()
                     if ammount > users[chosenuser].accounts[chosenaccount].Saldo(): 
                         print(Color.error + "ERROR!" + Color.default + "Cannot remove more than " + str(users[chosenuser].accounts[chosenaccount].Saldo()) + " usd from account!")
                     else:
                         selectingammount = False
 
+                if addremovemsg == "add":   addremovemsg = "added"
+
+                else: addremovemsg = "removed"
                 users[chosenuser].AdminTransaction(chosenaccount, addremove, ammount)
-                print(ammount + "")
+                print("{money} usd {addremove}! Returning to menu...".format(money = ammount, addremove = addremovemsg))
+                sleep(1)
+                loop = False
 
                 
 
